@@ -1,0 +1,25 @@
+<launch>
+  <arg name = "filename"		      /> 
+  <arg name = "cloud" default= "-cloud" />
+   <!--The yaml file contains supertoroid parameters.
+   Orientation in the form of axis-angle (rot axis*angle)-->
+  <group ns="stp">
+    <rosparam file = "$(find supertoroid)/config/STparameters.yaml" />
+  </group>
+  <node
+    pkg = "supertoroid"
+    type = "st_fitting_test_pcd"
+    name = "fittingST"
+    respawn = "false"
+    output = "screen"
+    args = "$(arg cloud)"
+    required = "true"  >
+    <param name="cloud" value="$(arg cloud)"/>
+  </node>
+<!--  <node
+    pkg = "supertoroid"
+    type = "pcd_viewer"
+    name = "visualizerPC"
+    respawn = "false"   
+  />  -->
+</launch>

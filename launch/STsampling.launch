@@ -1,0 +1,21 @@
+<launch>
+  <arg name = "filename"		      /> 
+  <arg name = "cloud" value = "/home/aperez/catkin_ws/STsynth.pcd"  />
+  <group ns="stp">
+    <rosparam file = "$(find supertoroid)/config/STparameters.yaml" />
+  </group>
+  <node
+    pkg = "supertoroid"
+    type = "sampling_test_pcd_st"
+    name = "samplingST"
+    respawn = "false"
+    output = "screen"
+    required = "true" >
+  </node>
+<!--  <node
+    pkg = "supertoroid"
+    type = "pcd_viewer"
+    name = "visualizerPC"
+    respawn = "false"   
+  />  -->
+</launch>
