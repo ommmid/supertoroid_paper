@@ -4,10 +4,10 @@ new version of the supertoroid repo that is used for the paper
 # Explanation
 The main three nodes are:
 
-sampling_test_pcd_st
-pcd_viewer
-st_fitting_test_pcd
-
+sampling_test_pcd_st   
+pcd_viewer   
+st_fitting_test_pcd   
+    
 The way the fitting works is the following:
 
 - load the point cloud
@@ -22,7 +22,7 @@ The way the fitting works is the following:
 # Usage
 run the following launch files:
 
-STsampling.launch
-STfitting.launch
+STsampling.launch   
+STfitting.launch   
 
 To change parameters: STparameters.yaml
