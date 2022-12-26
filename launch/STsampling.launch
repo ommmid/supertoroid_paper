@@ -1,6 +1,6 @@
 <launch>
   <arg name = "filename"		      /> 
-  <arg name = "cloud" value = "/home/aperez/catkin_ws/STsynth.pcd"  />
+  <arg name = "cloud" value = "/tmp/STsynth.pcd"  />
   <group ns="stp">
     <rosparam file = "$(find supertoroid)/config/STparameters.yaml" />
   </group>

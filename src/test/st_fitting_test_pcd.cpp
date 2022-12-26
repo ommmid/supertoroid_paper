@@ -51,10 +51,10 @@ int main(int argc, char *argv[])
   pcl::PointCloud<PointT>::Ptr sampled_cloud(new pcl::PointCloud<PointT>);
   sam->getCloud(sampled_cloud);
   std::cout<<"Size of the sampled cloud: "<<sampled_cloud->points.size()<<std::endl;
-  pcl::io::savePCDFileASCII ("/home/aperez/catkin_ws/STfittedOnly.pcd", *sampled_cloud);
+  pcl::io::savePCDFileASCII ("/tmp/STfittedOnly.pcd", *sampled_cloud);
   std::cerr << "Saved " << sampled_cloud->points.size () << " STfittedOnly.pcd." << std::endl;
   *sampled_cloud+=*cloud;
-  pcl::io::savePCDFileASCII ("/home/aperez/catkin_ws/STfitted.pcd", *sampled_cloud);
+  pcl::io::savePCDFileASCII ("/tmp/STfitted.pcd", *sampled_cloud);
   std::cerr << "Saved " << sampled_cloud->points.size () << " STfitted.pcd." << std::endl;
 
 

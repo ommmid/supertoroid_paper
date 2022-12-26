@@ -72,7 +72,7 @@ private:
       estimator_ = src.estimator_;
       return (*this);
     }
-
+  
     int operator () (const Eigen::VectorXd &xvec, Eigen::VectorXd &fvec) const;
     int df(const Eigen::VectorXd &xvec, Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &fjac) const;
 

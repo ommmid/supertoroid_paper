@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
   //*cloud_combined+= *cloud2;
 
   std::cout<<"Size of combined superquadrics cloud: "<<cloud_combined->points.size()<<std::endl;
-  std::string fileName = "/home/aperez/catkin_ws/STsynth.pcd";
+  std::string fileName = "/tmp/STsynth.pcd";
   pcl::io::savePCDFileASCII (fileName, *cloud_combined);
   std::cerr << "Saved " << cloud_combined->points.size () << " data points to " << fileName << std::endl;
 
