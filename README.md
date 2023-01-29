@@ -4,9 +4,9 @@ new version of the supertoroid repo that is used for the paper
 # Explanation
 The main three nodes are:
 
-sampling_test_pcd_st
-pcd_viewer
-st_fitting_test_pcd
+`sampling_test_pcd_st`\
+`pcd_viewer`\
+`st_fitting_test_pcd`\
 
 The way the fitting works is the following:
 
