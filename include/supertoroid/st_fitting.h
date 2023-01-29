@@ -22,6 +22,7 @@ public:
   void getPreAlignedCloud(pcl::PointCloud<PointT>::Ptr& cloud);
   void getMinParams(supertoroid::st& param);
   void getMinError(double& error);
+  bool check_rotation_matrix(const Eigen::Matrix3f& mat);
 
 private:
   pcl::PointCloud<PointT>::Ptr cloud_;
@@ -72,7 +73,7 @@ private:
       estimator_ = src.estimator_;
       return (*this);
     }
-  
+
     int operator () (const Eigen::VectorXd &xvec, Eigen::VectorXd &fvec) const;
     int df(const Eigen::VectorXd &xvec, Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &fjac) const;
 

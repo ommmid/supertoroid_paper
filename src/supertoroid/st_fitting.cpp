@@ -1,9 +1,10 @@
-#include<supertoroid/st_fitting.h>
+#include <supertoroid/st_fitting.h>
 #include <unsupported/Eigen/NonLinearOptimization> //This is the Levenberg optimization
 #include <pcl/features/moment_of_inertia_estimation.h>
 #include <pcl/common/pca.h>
 #include <pcl/common/common.h>
 #include <sys/time.h>
+#include <cmath>
 
 using namespace std::chrono;
 
@@ -51,15 +52,21 @@ void Fitting::preAlign(Eigen::Affine3f &transform, Eigen::Vector3f &variances){
   eig2 = eigenValues(1);
   eig3 = eigenValues(2);
   Eigen::Vector3f vec_dir = eigenVectors.col(0);
-  std::cout << "Eigenvectors ";
-  std::cout << vec_dir(0) << " "<< vec_dir(1) << " "<< vec_dir(2) << " ";
-  std::cout << "Eigenvalues ";
-  std::cout << eig1<< " "<< eig2 << " "<< eig3 << " ";
+  std::cout << "Eigenvectors " << std::endl;
+  std::cout << vec_dir(0) << " "<< vec_dir(1) << " "<< vec_dir(2) << " " << std::endl;
+  std::cout << "Eigenvalues "<< std::endl;;
+  std::cout << eig1<< " "<< eig2 << " "<< eig3 << " "<< std::endl;;
   //Here we rotate the x,y,z axis according to who is x, keeping direct trihedron
   Eigen::Vector3f vec_aux = eigenVectors.col(0);
   eigenVectors.col(0) = eigenVectors.col(pre_align_axis_);
   eigenVectors.col(1) = eigenVectors.col(pre_align_axis_ + 1 - 3*floor((pre_align_axis_ + 1)/3));
   eigenVectors.col(2) = eigenVectors.col(pre_align_axis_ + 2 - 3*floor((pre_align_axis_ + 2)/3));
+
+  std::cout << "pre_align_axis_: " << pre_align_axis_ << std::endl;
+  std::cout << "eigenVEctors : \n" << eigenVectors << std::endl;
+  std::cout << "is eigenVectors a rotation matrix? "  << check_rotation_matrix(eigenVectors)  << std::endl;
+
+
   //eigenVectors.col(pre_align_axis_) = vec_aux;
   float aux_ev = eigenValues(0);
   eigenValues(0) = eigenValues(pre_align_axis_);
@@ -84,7 +91,7 @@ void Fitting::preAlign(Eigen::Affine3f &transform, Eigen::Vector3f &variances){
 
 //Parameters (intrinsic+extrinsic) in xvec.
 //Transform all points of the cloud to orient it according to trans. Values of trans obtained from PCA
-//The aligned cloud 
+//The aligned cloud
 int Fitting::OptimizationFunctor::operator ()(const Eigen::VectorXd &xvec, Eigen::VectorXd &fvec) const{
   pcl::PointCloud<PointT>::Ptr cloud_new(new pcl::PointCloud<PointT>);
   cloud_new = estimator_->prealigned_cloud_;
@@ -114,7 +121,7 @@ void Fitting::fit(){
   double min_fit_error = std::numeric_limits<double>::max();
   supertoroid::st min_param;
   //ALBA: modification just for debugging, set back to 3 later if needed (it rotates through x,y,z to guess z)
-  for(int i=0;i<3;++i)
+  for(int i=0;i<1;++i)
   {
     double error;
     setPreAlign(true, i);
@@ -144,8 +151,8 @@ void Fitting::fit_param(supertoroid::st &param, double &final_error)
     pcl::transformPointCloud(*cloud_,*prealigned_cloud_, transform_inv);
     clock_gettime(CLOCK_REALTIME, &tsf);
     int difft = tsf.tv_nsec - tsi.tv_nsec;
-    std::cout << "Transforming the cloud Using PCA takes ";
-    std::cout << difft << " ";
+    std::cout << "Transforming the cloud Using PCA takes " << difft << " " << std::endl;
+
     //ALBA: Here I am trying to get some of the transformed points of the cloud
     //pcl::PointXYZRGB minpt, maxpt;
     //pcl::getMinMax3D (*prealigned_cloud_,minpt, maxpt);
@@ -179,7 +186,7 @@ void Fitting::fit_param(supertoroid::st &param, double &final_error)
   std::cout << "Values of t for checking: " << tx << " " << ty << " " << tz;
   std::cout << "Values of Euler angles for checking: " << ax << " " << ay << " " << az;
   xvec[6] = tx;
-  xvec[7] = ty; 
+  xvec[7] = ty;
   xvec[8] = tz;
   xvec[9] = xvec[10] =  xvec[11] =0.;
   //inital conditions to match the sampled supertoroid, for testing:
@@ -188,7 +195,7 @@ void Fitting::fit_param(supertoroid::st &param, double &final_error)
   xvec[2] = 5.0;
   xvec[3] = 4.0;
   xvec[4] = 0.3;
-  xvec[5] = 1.4;  
+  xvec[5] = 1.4;
   //Try to read params from launch file:
   //0-5 intrinsic, 6-8 location, 9-11 axis-angle orientation (dir vector*angle)
   ros::NodeHandle nh("~");
@@ -279,4 +286,28 @@ void Fitting::fit_param(supertoroid::st &param, double &final_error)
   param_lm.pose.orientation.w = q1.w();
   final_error = st_error(cloud_, param_lm);
 
+}
+
+bool Fitting::check_rotation_matrix(const Eigen::Matrix3f& mat){
+
+  bool unit_vector = false;
+  bool perpendicular = false;
+
+  Eigen::Vector3f x = mat.col(0);
+  Eigen::Vector3f y = mat.col(1);
+  Eigen::Vector3f z = mat.col(2);
+
+  if ( x.norm() && y.norm() && z.norm() )
+    unit_vector = true;
+
+
+  float threshold = 0.001;
+  if ( abs(x.dot(y)) < threshold && abs(x.dot(z)) < threshold  && abs(y.dot(z)) < threshold )
+    perpendicular =  true;
+
+  if (unit_vector && perpendicular)
+    return true;
+
+
+  return false;
 }
