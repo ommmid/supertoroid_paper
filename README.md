@@ -22,7 +22,7 @@ The way the fitting works is the following:
 # Usage
 run the following launch files:
 
-STsampling.launch
-STfitting.launch cloud:=/tmp/STsynth.pcd
+`STsampling.launch`
+`STfitting.launch cloud:=/tmp/STsynth.pcd`
 
 To change parameters: STparameters.yaml
