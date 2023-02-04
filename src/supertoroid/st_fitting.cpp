@@ -58,12 +58,16 @@ void Fitting::preAlign(Eigen::Affine3f &transform, Eigen::Vector3f &variances){
   std::cout << eig1<< " "<< eig2 << " "<< eig3 << " "<< std::endl;;
   //Here we rotate the x,y,z axis according to who is x, keeping direct trihedron
   Eigen::Vector3f vec_aux = eigenVectors.col(0);
-  eigenVectors.col(0) = eigenVectors.col(pre_align_axis_);
-  eigenVectors.col(1) = eigenVectors.col(pre_align_axis_ + 1 - 3*floor((pre_align_axis_ + 1)/3));
-  eigenVectors.col(2) = eigenVectors.col(pre_align_axis_ + 2 - 3*floor((pre_align_axis_ + 2)/3));
+  Eigen::Matrix3f eigen_vector_tmp = eigenVectors;
+
+  std::cout << "eigenVEctors before: \n" << eigenVectors << std::endl;
+
+  eigenVectors.col(0) = eigen_vector_tmp.col(pre_align_axis_);
+  eigenVectors.col(1) = eigen_vector_tmp.col(pre_align_axis_ + 1 - 3*floor((pre_align_axis_ + 1)/3));
+  eigenVectors.col(2) = eigen_vector_tmp.col(pre_align_axis_ + 2 - 3*floor((pre_align_axis_ + 2)/3));
 
   std::cout << "pre_align_axis_: " << pre_align_axis_ << std::endl;
-  std::cout << "eigenVEctors : \n" << eigenVectors << std::endl;
+  std::cout << "eigenVEctors after : \n" << eigenVectors << std::endl;
   std::cout << "is eigenVectors a rotation matrix? "  << check_rotation_matrix(eigenVectors)  << std::endl;
 
 
@@ -121,7 +125,7 @@ void Fitting::fit(){
   double min_fit_error = std::numeric_limits<double>::max();
   supertoroid::st min_param;
   //ALBA: modification just for debugging, set back to 3 later if needed (it rotates through x,y,z to guess z)
-  for(int i=0;i<1;++i)
+  for(int i=2;i<3;++i)
   {
     double error;
     setPreAlign(true, i);

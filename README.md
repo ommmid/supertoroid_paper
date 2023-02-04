@@ -6,7 +6,7 @@ The main three nodes are:
 
 `sampling_test_pcd_st`\
 `pcd_viewer`\
-`st_fitting_test_pcd`\
+`st_fitting_test_pcd`
 
 The way the fitting works is the following:
 

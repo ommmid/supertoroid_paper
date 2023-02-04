@@ -1,5 +1,5 @@
 <launch>
-  <arg name = "filename"		      /> 
+  <arg name = "filename"		      />
   <arg name = "cloud" default= "-cloud" />
    <!--The yaml file contains supertoroid parameters.
    Orientation in the form of axis-angle (rot axis*angle)-->
@@ -20,6 +20,6 @@
     pkg = "supertoroid"
     type = "pcd_viewer"
     name = "visualizerPC"
-    respawn = "false"   
+    respawn = "false"
   />  -->
 </launch>
