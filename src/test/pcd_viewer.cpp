@@ -23,10 +23,12 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "pcd_viewer");
   ros::NodeHandle nh;
 
-  std::cout << "enter the name of the file: " << std::endl;
-  std::string fileName;
-  cin >> fileName;
+  //  std::cout << "enter the name of the file: " << std::endl;
+  //std::string fileName;
+  // cin >> fileName;
  //fileName = "supt.pcd";
+  std::string fileName = argv[1];
+  std::cout << "reading file: " << fileName << std::endl;
   display_pcd(fileName);
 
 }

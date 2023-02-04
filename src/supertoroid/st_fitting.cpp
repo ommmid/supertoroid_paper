@@ -125,7 +125,7 @@ void Fitting::fit(){
   double min_fit_error = std::numeric_limits<double>::max();
   supertoroid::st min_param;
   //ALBA: modification just for debugging, set back to 3 later if needed (it rotates through x,y,z to guess z)
-  for(int i=2;i<3;++i)
+  for(int i=0;i<1;++i)
   {
     double error;
     setPreAlign(true, i);
