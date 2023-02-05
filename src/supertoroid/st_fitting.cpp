@@ -32,12 +32,16 @@ void Fitting::preAlign(Eigen::Affine3f &transform, Eigen::Vector3f &variances){
   struct timespec tsf;
   clock_gettime(CLOCK_REALTIME, &tsi);
   pcl::compute3DCentroid(*cloud_, xyz_centroid);
+  
   clock_gettime(CLOCK_REALTIME, &tsf);
   int difft = tsf.tv_nsec - tsi.tv_nsec;
   std::cout << "Computing the centroid takes ";
   std::cout << difft << " ";
   Eigen::Affine3f transform_centroid = Eigen::Affine3f::Identity();
   transform_centroid.translation()<<-xyz_centroid(0), -xyz_centroid(1), -xyz_centroid(2);
+  std::cout << "transform_centroid:\n" << transform_centroid.matrix() << std::endl;
+  
+  // --- calculate pca
   clock_gettime(CLOCK_REALTIME, &tsi);
   pcl::PCA<PointT> pca;
   pca.setInputCloud(cloud_);
@@ -45,18 +49,19 @@ void Fitting::preAlign(Eigen::Affine3f &transform, Eigen::Vector3f &variances){
   Eigen::Matrix3f eigenVectors = pca.getEigenVectors();
   clock_gettime(CLOCK_REALTIME, &tsf);
   difft = tsf.tv_nsec - tsi.tv_nsec;
-  std::cout << "Computing the PCA takes ";
+  std::cout << "Computing the PCA takes " << std::endl;
   std::cout << difft << " ";
-  double eig1,eig2,eig3;
-  eig1 = eigenValues(0);
-  eig2 = eigenValues(1);
-  eig3 = eigenValues(2);
   Eigen::Vector3f vec_dir = eigenVectors.col(0);
-  std::cout << "Eigenvectors " << std::endl;
-  std::cout << vec_dir(0) << " "<< vec_dir(1) << " "<< vec_dir(2) << " " << std::endl;
-  std::cout << "Eigenvalues "<< std::endl;;
-  std::cout << eig1<< " "<< eig2 << " "<< eig3 << " "<< std::endl;;
-  //Here we rotate the x,y,z axis according to who is x, keeping direct trihedron
+  std::cout << "Eigenvectors:\n" << eigenVectors.matrix() << std::endl;
+  std::cout << "Eigenvalues:\n" << eigenValues << std::endl;;
+  
+  // --- which axis is the hole axis of the current point cloud pcd_
+  Eigen::Affine3f pca_affine(eigenVectors);
+  pca_affine.translation() = Eigen::Vector3f(xyz_centroid[0], xyz_centroid[1], xyz_centroid[2]);
+  std::cout << "pca affine:\n" << pca_affine.matrix()  << std::endl;
+  int hole_axis_index = selectHoleAxis(pca_affine);
+
+  // --- Here we rotate the x,y,z axis according to who is x, keeping direct trihedron
   Eigen::Vector3f vec_aux = eigenVectors.col(0);
   Eigen::Matrix3f eigen_vector_tmp = eigenVectors;
 
@@ -152,7 +157,7 @@ void Fitting::fit_param(supertoroid::st &param, double &final_error)
     clock_gettime(CLOCK_REALTIME, &tsi);
     preAlign(transform_inv, variances);
     prealigned_cloud_.reset(new pcl::PointCloud<PointT>);
-    pcl::transformPointCloud(*cloud_,*prealigned_cloud_, transform_inv);
+    pcl::transformPointCloud(*cloud_, *prealigned_cloud_, transform_inv); // transform cloud_ to the prealigned one
     clock_gettime(CLOCK_REALTIME, &tsf);
     int difft = tsf.tv_nsec - tsi.tv_nsec;
     std::cout << "Transforming the cloud Using PCA takes " << difft << " " << std::endl;
@@ -290,6 +295,30 @@ void Fitting::fit_param(supertoroid::st &param, double &final_error)
   param_lm.pose.orientation.w = q1.w();
   final_error = st_error(cloud_, param_lm);
 
+}
+
+int Fitting::selectHoleAxis(const Eigen::Affine3f& hm){
+
+  pcl::PointCloud<PointT>::Ptr cloud_transformed(new pcl::PointCloud<PointT>);
+  pcl::transformPointCloud(*cloud_, *cloud_transformed, hm);
+
+  int num_points = static_cast<int>(cloud_transformed->size());
+  std::cout << "injaaaaa" << num_points << std::endl;
+  // Eigen::Array<float, 1,  num_points> xs();
+  // std::vector<float> ys;
+  // std::vector<float> zs;
+
+  // for(size_t i=0; i<cloud_transformed->size(); ++i){
+  //   //double op =st_normPoint(new_cloud->at(i));
+  //   //double val = op * st_function_scale_weighting(new_cloud->at(i), param);
+  //   xs << cloud_transformed->points.at(i).x;
+  //   ys.push_back(cloud_transformed->points.at(i).y);
+  //   zs.push_back(cloud_transformed->points.at(i).z);1
+  // }
+
+  // std::cout << "injaaaaa" << xs.size() << std::endl;
+
+  return 1;
 }
 
 bool Fitting::check_rotation_matrix(const Eigen::Matrix3f& mat){

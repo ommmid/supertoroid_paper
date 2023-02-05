@@ -24,6 +24,12 @@ public:
   void getMinError(double& error);
   bool check_rotation_matrix(const Eigen::Matrix3f& mat);
 
+  /** \breif for the cloud_ of the current class instance,returns the index of the eigen vector that best represents the axis going through the hole 
+    * first transform the pont cloud to mat and then check which axis has the mean around 0 of that axis
+    * \param[in] hm: homogeneous matrix, 4x4
+    */
+  int selectHoleAxis(const Eigen::Affine3f& hm);
+
 private:
   pcl::PointCloud<PointT>::Ptr cloud_;
   pcl::PointCloud<PointT>::Ptr prealigned_cloud_;
