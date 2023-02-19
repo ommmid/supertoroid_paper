@@ -5,6 +5,9 @@
 #include <pcl/common/common.h>
 #include <sys/time.h>
 #include <cmath>
+#include <valarray>
+#include <assert.h>  
+
 
 using namespace std::chrono;
 
@@ -298,25 +301,36 @@ void Fitting::fit_param(supertoroid::st &param, double &final_error)
 }
 
 int Fitting::selectHoleAxis(const Eigen::Affine3f& hm){
+  double close_to_zero = 0.001
+  int min_num_points = 0 // there might be noise, so the number of points should be close to zero but not zero?
 
   pcl::PointCloud<PointT>::Ptr cloud_transformed(new pcl::PointCloud<PointT>);
   pcl::transformPointCloud(*cloud_, *cloud_transformed, hm);
 
-  int num_points = static_cast<int>(cloud_transformed->size());
-  std::cout << "injaaaaa" << num_points << std::endl;
-  // Eigen::Array<float, 1,  num_points> xs();
-  // std::vector<float> ys;
-  // std::vector<float> zs;
+  const int num_points = static_cast<int>(cloud_transformed->size());
+  // to be able to use masking indices we use valarray
+  std::valarray<int> xs(num_points);
+  std::valarray<int> ys(num_points);
+  std::valarray<int> zs(num_points);
 
-  // for(size_t i=0; i<cloud_transformed->size(); ++i){
-  //   //double op =st_normPoint(new_cloud->at(i));
-  //   //double val = op * st_function_scale_weighting(new_cloud->at(i), param);
-  //   xs << cloud_transformed->points.at(i).x;
-  //   ys.push_back(cloud_transformed->points.at(i).y);
-  //   zs.push_back(cloud_transformed->points.at(i).z);1
-  // }
+  for(size_t i=0; i<num_points; ++i){
+    xs[i] = cloud_transformed->points.at(i).x;
+    ys[i] = cloud_transformed->points.at(i).y;
+    zs[i] = cloud_transformed->points.at(i).z;
+  }
 
-  // std::cout << "injaaaaa" << xs.size() << std::endl;
+  // find permutations (selecting 3 out of 3 with order) of 0,1,2 (x1, x2, x3), (x1, x3, x2) ...
+
+  for i in combo{
+
+    auto xindx = std::abs(xs) < close_to_zero;
+    std::assert(xindex.size() > min_num_points); // there must be some points for any selected first axis, it means the pca is not in the middle of the point cloud
+    auto yindx = ys[xindx];
+    if (yindx.size() <= min_num_points){
+      return 2;
+    }
+
+  }
 
   return 1;
 }
